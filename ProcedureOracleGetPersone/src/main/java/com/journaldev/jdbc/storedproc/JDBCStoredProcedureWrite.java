@@ -3,8 +3,10 @@ package com.journaldev.jdbc.storedproc;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+
+import oracle.jdbc.OracleTypes;
 
 public class JDBCStoredProcedureWrite {
 
@@ -14,19 +16,18 @@ public class JDBCStoredProcedureWrite {
 		
 		try{
 			con = DBConnection.getConnection();
-			stmt = con.prepareCall("{call getPersona(?,?,?,?)}");
+			stmt = con.prepareCall("{call getPersonaByEta(?,?)}");
 			
-			stmt.setString(1,"Gabriele");			
-			stmt.registerOutParameter(2, java.sql.Types.VARCHAR);
-			stmt.registerOutParameter(3, java.sql.Types.VARCHAR);
-			stmt.registerOutParameter(4, java.sql.Types.VARCHAR);
-			stmt.executeUpdate();
+			stmt.setInt(1,23);			
+			stmt.registerOutParameter(2, OracleTypes.CURSOR);
+			
+			stmt.execute();
+
+			ResultSet rs = (ResultSet) stmt.getObject(2);
 		
-            String nome = stmt.getString(2);
-            String cognome = stmt.getString(3);
-            int eta = stmt.getInt(4);
-			
-			System.out.println(nome + " " + cognome + " " + eta );
+            while(rs.next()) {
+			System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getInt(3) );
+            }
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
